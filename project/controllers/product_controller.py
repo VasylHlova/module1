@@ -16,6 +16,9 @@ def sql_create_product(data: Dict[str, Any], model_name: str = "product") -> Dic
     Product.use_db("sqlite")
     
     product = Product.create(model_name, **data)
+    if not product:
+        Product.use_db("default")
+        return {"status": "error", "message": "Product creation failed"}
     Product.use_db("default")
     return {"status": "success", "product": product.to_dict()}
 
@@ -30,6 +33,8 @@ def create_product(data: Dict[str, Any]) -> Dict[str, Any]:
         Dict[str, Any]: Creation result with product data.
     """
     product = Product.create(**data)
+    if not product:
+        return {"status": "error", "message": "Product creation failed"}
     return {"status": "success", "product": product.to_dict()}
 
 @route('/sql/products/get')

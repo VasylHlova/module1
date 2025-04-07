@@ -16,6 +16,10 @@ def sql_create_user(data: Dict[str, Any], model_name: str = "user") -> Dict[str,
     User.use_db("sqlite")
     
     user = User.create(model_name, **data)
+    if not user:
+        User.use_db("default")
+        return {"status": "error", "message": "User creation failed"}
+         
     User.use_db("default")
     return {"status": "success", "user": user.to_dict()}
 
@@ -30,6 +34,8 @@ def create_user(data: Dict[str, Any]) -> Dict[str, Any]:
         Dict[str, Any]: Creation result with user data.
     """
     user = User.create(**data)
+    if not user:
+        return {"status": "error", "message": "User creation failed"}
     return {"status": "success", "user": user.to_dict()}
 
 @route('/sql/users/get')

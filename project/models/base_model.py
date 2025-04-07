@@ -44,6 +44,7 @@ class BaseModel(metaclass=BaseModelMeta):
         Returns:
             Dict[str, Any]: Dictionary representation of the model.
         """
+        
         return {k: v for k, v in self.__dict__.items()}
 
     @classmethod
@@ -73,11 +74,14 @@ class BaseModel(metaclass=BaseModelMeta):
         Returns:
             BaseModel: New model instance if successful, None otherwise.
         """
-        model = model_name or cls.__name__.lower()
-        record = cls._db_instance.create(model, data)
-        
-        if record:
-            return cls(**record)
+        if data:
+            model = model_name or cls.__name__.lower()
+            record = cls._db_instance.create(model, data)
+            
+            if record:
+                return cls(**record)
+        else:
+            raise ValueError("No data provided for creation")    
         return None
 
     @classmethod
@@ -112,13 +116,16 @@ class BaseModel(metaclass=BaseModelMeta):
         Returns:
             BaseModel: Updated model instance if successful, None otherwise.
         """
-        if obj_id is None:
-            obj_id = model_name
-            model_name = cls.__name__.lower()
-        record = cls._db_instance.update(model_name, obj_id, data)
-        
-        if record:
-            return cls(**record)
+        if data:
+            if obj_id is None:
+                obj_id = model_name
+                model_name = cls.__name__.lower()
+            record = cls._db_instance.update(model_name, obj_id, data)
+            
+            if record:
+                return cls(**record)
+        else:
+            raise ValueError("No data provided for update")    
         return None
 
     @classmethod
